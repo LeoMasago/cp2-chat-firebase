@@ -39,3 +39,15 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# logs de emuladores e testes
+*-debug.log
+*.log
+emulator-tests/node_modules/
+
+# segredos administrativos (nunca versionar)
+serviceAccountKey.json
+firebaseAdminCredentials.json
+*-firebase-adminsdk-*.json
+
+.claude

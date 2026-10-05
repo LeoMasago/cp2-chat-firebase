@@ -1,0 +1,18 @@
+{
+  "name": "cp2-emulator-tests",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Testes no Firebase Emulator: regras de segurança (Firestore, Realtime Database, Storage) e integração da API de notificações.",
+  "scripts": {
+    "test": "firebase emulators:exec --config ../firebase.json --project demo-cp2 --only auth,firestore,database,storage \"vitest run\""
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.2",
+    "@types/node": "^22.20.5",
+    "firebase": "^12.19.0",
+    "firebase-tools": "^15.32.1",
+    "typescript": "~5.9.2",
+    "vitest": "^5.0.3"
+  }
+}

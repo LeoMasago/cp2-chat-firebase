@@ -1,0 +1,57 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "groupMembers": {
+      ".read": false,
+      ".write": false
+    },
+
+    "messages": {
+      "$conversationId": {
+        ".read": "auth != null && (root.child('groupMembers').child($conversationId).child(auth.uid).val() === true || ($conversationId.matches(/^[A-Za-z0-9]+_[A-Za-z0-9]+$/) && ($conversationId.beginsWith(auth.uid + '_') || $conversationId.endsWith('_' + auth.uid))))",
+        ".indexOn": ["createdAt"],
+
+        "$messageId": {
+          ".write": "auth != null && !data.exists() && newData.exists() && (root.child('groupMembers').child($conversationId).child(auth.uid).val() === true || ($conversationId.matches(/^[A-Za-z0-9]+_[A-Za-z0-9]+$/) && ($conversationId.beginsWith(auth.uid + '_') || $conversationId.endsWith('_' + auth.uid))))",
+          ".validate": "newData.hasChildren(['conversationId', 'conversationType', 'senderId', 'text', 'target', 'createdAt']) && newData.child('senderId').val() === auth.uid && newData.child('conversationId').val() === $conversationId && newData.child('text').val().length > 0 && newData.child('text').val().length <= 2000 && newData.child('createdAt').val() === now && ((newData.child('conversationType').val() === 'direct' && $conversationId.matches(/^[A-Za-z0-9]+_[A-Za-z0-9]+$/)) || (newData.child('conversationType').val() === 'group' && root.child('groupMembers').child($conversationId).child(auth.uid).val() === true))",
+
+          "conversationId": { ".validate": "newData.isString()" },
+          "conversationType": { ".validate": "newData.isString()" },
+          "senderId": { ".validate": "newData.isString()" },
+          "text": { ".validate": "newData.isString()" },
+          "createdAt": { ".validate": "newData.isNumber()" },
+
+          "target": {
+            ".validate": "newData.hasChild('type') && (newData.child('type').val() === 'conversation' || (newData.child('type').val() === 'member' && newData.hasChild('memberId')))",
+            "type": { ".validate": "newData.isString()" },
+            "memberId": { ".validate": "newData.isString() && newData.parent().child('type').val() === 'member' && root.child('groupMembers').child($conversationId).child(newData.val()).val() === true" },
+            "$other": { ".validate": false }
+          },
+
+          "mentionedUserIds": {
+            "$index": { ".validate": "newData.isString() && root.child('groupMembers').child($conversationId).child(newData.val()).val() === true" }
+          },
+
+          "$other": { ".validate": false }
+        }
+      }
+    },
+
+    "conversationMeta": {
+      "$conversationId": {
+        ".read": "auth != null && (root.child('groupMembers').child($conversationId).child(auth.uid).val() === true || ($conversationId.matches(/^[A-Za-z0-9]+_[A-Za-z0-9]+$/) && ($conversationId.beginsWith(auth.uid + '_') || $conversationId.endsWith('_' + auth.uid))))",
+
+        "lastMessage": {
+          ".write": "auth != null && (root.child('groupMembers').child($conversationId).child(auth.uid).val() === true || ($conversationId.matches(/^[A-Za-z0-9]+_[A-Za-z0-9]+$/) && ($conversationId.beginsWith(auth.uid + '_') || $conversationId.endsWith('_' + auth.uid))))",
+          ".validate": "newData.hasChildren(['text', 'senderId', 'createdAt']) && newData.child('senderId').val() === auth.uid && newData.child('text').val().length <= 200 && newData.child('createdAt').val() === now",
+          "text": { ".validate": "newData.isString()" },
+          "senderId": { ".validate": "newData.isString()" },
+          "createdAt": { ".validate": "newData.isNumber()" },
+          "$other": { ".validate": false }
+        }
+      }
+    }
+  }
+}

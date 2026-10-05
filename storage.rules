@@ -1,0 +1,35 @@
+rules_version = '2';
+
+// Regras do Firebase Storage — fotos de perfil e de grupos.
+// Somente a URL final do arquivo é gravada no Firestore (nunca Base64).
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function validImage() {
+      return request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/(jpeg|png|webp|heic|heif)');
+    }
+
+    // profilePhotos/{uid}/arquivo — só o próprio usuário envia.
+    match /profilePhotos/{uid}/{fileName} {
+      allow read: if signedIn();
+      allow create, update: if signedIn() && request.auth.uid == uid && validImage();
+      allow delete: if signedIn() && request.auth.uid == uid;
+    }
+
+    // groupPhotos/{uidDoProprietario}/arquivo — só quem cria/gerencia o grupo envia.
+    match /groupPhotos/{ownerUid}/{fileName} {
+      allow read: if signedIn();
+      allow create, update: if signedIn() && request.auth.uid == ownerUid && validImage();
+      allow delete: if signedIn() && request.auth.uid == ownerUid;
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

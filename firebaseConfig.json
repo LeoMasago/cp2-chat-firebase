@@ -1,0 +1,9 @@
+{
+  "apiKey": "AIzaSyBxc9sEgjPnxfYQaJCoqgiRVWYi1AP3VQ0",
+  "authDomain": "cp2-chat.firebaseapp.com",
+  "databaseURL": "https://cp2-chat-default-rtdb.firebaseio.com",
+  "projectId": "cp2-chat",
+  "storageBucket": "cp2-chat.firebasestorage.app",
+  "messagingSenderId": "863248790362",
+  "appId": "1:863248790362:web:16aa33df56e9ac84317963"
+}

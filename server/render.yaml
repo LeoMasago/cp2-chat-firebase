@@ -1,0 +1,25 @@
+# Blueprint do Render (https://render.com/docs/blueprint-spec).
+# Os segredos são marcados com `sync: false`: o Render pede os valores no painel
+# e eles NÃO ficam no repositório.
+services:
+  - type: web
+    name: cp2-chat-api
+    runtime: docker
+    rootDir: server
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: FIREBASE_PROJECT_ID
+        sync: false
+      - key: FIREBASE_CLIENT_EMAIL
+        sync: false
+      - key: FIREBASE_PRIVATE_KEY
+        sync: false
+      - key: FIREBASE_DATABASE_URL
+        sync: false
+      - key: EXPO_ACCESS_TOKEN
+        sync: false
+      - key: NOTIFICATION_PREVIEW
+        value: "true"
+      - key: TRUST_PROXY
+        value: "1"

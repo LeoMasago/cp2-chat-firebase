@@ -25,9 +25,11 @@ Run lint and typecheck before declaring any task done.
 
 ## Navigation & Routing
 
-- Use **Expo Router** for all navigation. Routes live in `src/app/` — every file there is a screen, `_layout.tsx` files define navigators. Keep non-route code (components, hooks, utils) outside `src/app/`.
-- Import `Link`, `router`, and `useLocalSearchParams` from `expo-router`.
-- Docs: https://docs.expo.dev/router/introduction.md
+- This project uses **React Navigation** (`@react-navigation/native-stack`), not Expo Router: the assignment's required structure is `src/screens/*`, with typed route params in `src/types/navigation.ts` (`RootStackParamList` / `ScreenProps<'Name'>`). Do not add Expo Router.
+- Screens live in `src/screens/`, registered in `src/navigation/RootNavigator.tsx` (auth flow = conditional screen groups driven by `useAuth().status`).
+- Layering: `screens` → `hooks` → `services` (Firebase / API) → `utils` (pure, unit-tested) and `types`. Screens must not call Firebase directly.
+- The project forbids `any` (`npm run check:any`). Run `npm run check` (typecheck + no-any + unit tests of app and API) before finishing a task.
+- Docs: https://reactnavigation.org/docs/getting-started
 
 ## Building with EAS
 
