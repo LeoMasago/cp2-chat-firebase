@@ -166,10 +166,17 @@ async function saveDevice(uid: string, deviceId: string, token: DeviceToken): Pr
 /**
  * Solicita permissão, obtém o token do dispositivo e o grava em `users/{uid}/devices/{deviceId}`.
  * O resultado descreve cada situação (negada, sem token, simulador...) para a interface exibir.
+ *
+ * Emuladores Android com Google Play recebem FCM normalmente ("ambiente compatível"), então
+ * só são recusados os ambientes que de fato não recebem push: simulador do iOS e web.
+ * Se o emulador não tiver os serviços do Google, a obtenção do token falha e vira `no_token`/`error`.
  */
 export async function registerDevice(uid: string): Promise<PushRegistrationResult> {
-  if (!Device.isDevice) {
-    return { status: 'unsupported', reason: 'Notificações push só funcionam em dispositivo físico.' };
+  if (!Device.isDevice && Platform.OS !== 'android') {
+    return {
+      status: 'unsupported',
+      reason: 'Notificações push exigem um aparelho físico (ou um emulador Android com Google Play).',
+    };
   }
   try {
     await ensureAndroidChannel();

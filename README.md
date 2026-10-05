@@ -251,7 +251,7 @@ não pôde ser registrado.
 
 Comportamento no app (`notificationService.ts` / `useNotifications.ts`):
 - solicita a permissão; se **negada**, exibe um aviso com atalho para as configurações;
-- se o aparelho **não retorna token** (simulador, `google-services.json` ausente, sem `projectId`), informa o motivo;
+- se o aparelho **não retorna token** (simulador do iOS, emulador sem Google Play, `google-services.json` ausente, sem `projectId`), informa o motivo. **Emuladores Android com Google Play** ("ambiente compatível" do enunciado) recebem o push normalmente;
 - o token é mantido atualizado (`addPushTokenListener`) e o usuário pode **desligar o push neste aparelho** em *Perfil*;
 - no **logout** o aparelho é removido dos destinos do usuário;
 - ao **tocar** na notificação (app aberto, em segundo plano ou fechado) o app abre `Conversas → Chat` da conversa
