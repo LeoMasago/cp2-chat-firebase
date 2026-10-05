@@ -126,7 +126,7 @@ quatro pontos (todos autenticados com o **Firebase ID Token** do usuário):
 │   │   └── services/               # firebaseAdmin, firebaseStore, recipientResolver,
 │   │                               # messageNotifier, notificationSender, profileAccess
 │   ├── test/                       # testes unitários e de rotas (Vitest)
-│   ├── Dockerfile / render.yaml    # publicação
+│   ├── Dockerfile                  # publicação (o render.yaml fica na raiz do repositório)
 │   └── .env.example
 ├── emulator-tests/                 # testes das regras e da API no Firebase Emulator
 ├── docs/screenshots/               # prints das telas
@@ -267,10 +267,9 @@ lê o Realtime Database e o Firestore e envia o push. **Não usa Cloud Functions
 
 ### URL pública e verificação de disponibilidade
 
-> **URL da API publicada:** `https://SUA-API.onrender.com`  ← ⚠️ substitua pela URL real após o deploy (e use a mesma em
-> `EXPO_PUBLIC_API_URL`).
+> **URL da API publicada:** `https://cp2-chat-api-eqkm.onrender.com` (a mesma usada em `EXPO_PUBLIC_API_URL` no `.env` do app).
 >
-> **Health check (público):** `GET https://SUA-API.onrender.com/health` → `{"status":"ok","service":"cp2-chat-api",...}`
+> **Health check (público):** `GET https://cp2-chat-api-eqkm.onrender.com/health` → `{"status":"ok","service":"cp2-chat-api",...}`
 
 ### Endpoints
 
@@ -329,9 +328,9 @@ npm run build && npm start  # produção (as variáveis vêm do ambiente da hosp
 
 ### Publicar (exemplo: Render + Docker)
 
-O repositório inclui `server/Dockerfile` e `render.yaml` (blueprint). Também funciona em Cloud Run, Fly.io e Railway.
+O repositório inclui `server/Dockerfile` e o blueprint `render.yaml` (na raiz). Também funciona em Cloud Run, Fly.io e Railway.
 
-1. Em [render.com](https://render.com) → **New → Blueprint** → selecione este repositório (usa `render.yaml`, `rootDir: server`).
+1. Em [render.com](https://render.com) → **New → Blueprint** → selecione este repositório (usa o `render.yaml` da raiz; contexto Docker `./server`).
 2. No painel, preencha as variáveis marcadas como secretas (`FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`,
    `FIREBASE_PRIVATE_KEY`, `FIREBASE_DATABASE_URL`). Cole a chave privada exatamente como está no JSON (com os `\n`).
 3. Aguarde o deploy, abra `https://<seu-servico>.onrender.com/health` e copie a URL para o `.env` do app e para este README.
