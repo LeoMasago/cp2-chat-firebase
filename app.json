@@ -45,6 +45,12 @@
           "microphonePermission": false
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "566092cb-d19f-433b-9633-a5d5c7f8d470"
+      }
+    },
+    "owner": "leomasago"
   }
 }
