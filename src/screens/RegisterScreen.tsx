@@ -89,7 +89,7 @@ export function RegisterScreen({ navigation }: ScreenProps<'Register'>) {
     <FormScreen keyboardVerticalOffset={64}>
       <View style={styles.photo}>
         <PhotoPicker picked={photo} onPick={setPhoto} label="Escolher foto de perfil" />
-        <Text style={styles.hint}>A foto é opcional e fica salva no Firebase Storage.</Text>
+        <Text style={styles.hint}>A foto é opcional. Sem foto, usamos uma imagem padrão.</Text>
       </View>
 
       <TextField

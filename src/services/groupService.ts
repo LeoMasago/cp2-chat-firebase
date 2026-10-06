@@ -24,8 +24,29 @@ import { uploadGroupPhoto } from './storageService';
 export const SYNC_FAILED_MESSAGE =
   'O grupo foi salvo, mas o acesso dos integrantes às mensagens ainda não foi atualizado. Abra o grupo e toque em "Sincronizar acesso".';
 
-/** Resultado de criar/alterar um grupo. `accessSynced = false` → o grupo foi salvo, mas a API não respondeu. */
-export type GroupSaveResult = { group: ChatGroup; accessSynced: boolean };
+export const PHOTO_FAILED_MESSAGE =
+  'O grupo foi salvo, mas a foto não pôde ser enviada agora. Você pode tentar de novo editando o grupo.';
+
+/**
+ * Resultado de criar/alterar um grupo.
+ *  - `accessSynced = false` → o grupo foi salvo, mas a API não respondeu;
+ *  - `photoUploadFailed = true` → o grupo foi salvo sem a foto (ex.: Storage indisponível).
+ */
+export type GroupSaveResult = { group: ChatGroup; accessSynced: boolean; photoUploadFailed: boolean };
+
+/** O envio da foto nunca impede salvar o grupo: em caso de falha o grupo segue com a imagem padrão. */
+async function tryUploadGroupPhoto(
+  ownerId: string,
+  groupId: string,
+  photo: PickedImage | null | undefined,
+): Promise<{ photoUrl: string | null; failed: boolean }> {
+  if (!photo) return { photoUrl: null, failed: false };
+  try {
+    return { photoUrl: await uploadGroupPhoto(ownerId, groupId, photo), failed: false };
+  } catch {
+    return { photoUrl: null, failed: true };
+  }
+}
 
 async function trySyncGroupAccess(groupId: string): Promise<boolean> {
   try {
@@ -101,7 +122,8 @@ export async function createGroup(ownerId: string, input: NewGroupInput): Promis
   }
 
   const groupRef = doc(collection(firestore, 'groups'));
-  const photoUrl = input.photo ? await uploadGroupPhoto(ownerId, groupRef.id, input.photo) : '';
+  const upload = await tryUploadGroupPhoto(ownerId, groupRef.id, input.photo);
+  const photoUrl = upload.photoUrl ?? '';
 
   const now = Date.now();
   const document: Omit<ChatGroup, 'id'> = {
@@ -117,7 +139,7 @@ export async function createGroup(ownerId: string, input: NewGroupInput): Promis
   await setDoc(groupRef, document);
 
   const accessSynced = await trySyncGroupAccess(groupRef.id);
-  return { group: { id: groupRef.id, ...document }, accessSynced };
+  return { group: { id: groupRef.id, ...document }, accessSynced, photoUploadFailed: upload.failed };
 }
 
 /**
@@ -136,7 +158,8 @@ export async function updateGroup(
   newPhoto?: PickedImage,
 ): Promise<GroupSaveResult> {
   const effectiveChanges: GroupChanges = { ...changes };
-  if (newPhoto) effectiveChanges.photoUrl = await uploadGroupPhoto(actorId, groupId, newPhoto);
+  const upload = await tryUploadGroupPhoto(actorId, groupId, newPhoto);
+  if (upload.photoUrl) effectiveChanges.photoUrl = upload.photoUrl;
 
   const groupRef = doc(firestore, 'groups', groupId);
   const updated = await runTransaction(firestore, async (transaction) => {
@@ -159,5 +182,5 @@ export async function updateGroup(
   const membersChanged =
     (changes.addMemberIds?.length ?? 0) > 0 || (changes.removeMemberIds?.length ?? 0) > 0;
   const accessSynced = membersChanged ? await trySyncGroupAccess(groupId) : true;
-  return { group: updated, accessSynced };
+  return { group: updated, accessSynced, photoUploadFailed: upload.failed };
 }

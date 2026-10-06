@@ -12,7 +12,7 @@ import { TextField } from '../components/TextField';
 import { useCurrentUser } from '../hooks/useAuth';
 import { useGroup } from '../hooks/useGroups';
 import { usePublicProfiles } from '../hooks/useUsers';
-import { createGroup, SYNC_FAILED_MESSAGE, syncGroupAccess, updateGroup } from '../services/groupService';
+import { createGroup, PHOTO_FAILED_MESSAGE, SYNC_FAILED_MESSAGE, syncGroupAccess, updateGroup } from '../services/groupService';
 import { colors, fontSize, radius, spacing } from '../theme';
 import { MIN_GROUP_MEMBERS, type GroupChanges } from '../types/group';
 import type { PickedImage } from '../types/media';
@@ -28,6 +28,14 @@ import {
 } from '../utils/groupValidation';
 
 const DEFAULT_LIMIT = 10;
+
+/** O grupo já foi salvo; avisa o que ficou pendente (acesso às mensagens e/ou foto). */
+function notifyPartialSave(accessSynced: boolean, photoUploadFailed: boolean): void {
+  const notices: string[] = [];
+  if (!accessSynced) notices.push(SYNC_FAILED_MESSAGE);
+  if (photoUploadFailed) notices.push(PHOTO_FAILED_MESSAGE);
+  if (notices.length > 0) Alert.alert('Atenção', notices.join('\n\n'));
+}
 
 /** Criação e edição de grupos (nome, foto, integrantes, limite e política de notificações). */
 export function GroupFormScreen({ navigation, route }: ScreenProps<'GroupForm'>) {
@@ -104,14 +112,14 @@ export function GroupFormScreen({ navigation, route }: ScreenProps<'GroupForm'>)
     setSaving(true);
     try {
       if (!existingGroup) {
-        const { group, accessSynced } = await createGroup(user.uid, {
+        const { group, accessSynced, photoUploadFailed } = await createGroup(user.uid, {
           name,
           photo,
           memberIds,
           memberLimit: limit,
           notificationPolicy: policy,
         });
-        if (!accessSynced) Alert.alert('Atenção', SYNC_FAILED_MESSAGE);
+        notifyPartialSave(accessSynced, photoUploadFailed);
         navigation.replace('Chat', { conversationId: group.id, conversationType: 'group' });
         return;
       }
@@ -124,8 +132,8 @@ export function GroupFormScreen({ navigation, route }: ScreenProps<'GroupForm'>)
       if (limit !== existingGroup.memberLimit) changes.memberLimit = limit;
       if (policy !== existingGroup.notificationPolicy) changes.notificationPolicy = policy;
 
-      const { accessSynced } = await updateGroup(existingGroup.id, user.uid, changes, photo ?? undefined);
-      if (!accessSynced) Alert.alert('Atenção', SYNC_FAILED_MESSAGE);
+      const { accessSynced, photoUploadFailed } = await updateGroup(existingGroup.id, user.uid, changes, photo ?? undefined);
+      notifyPartialSave(accessSynced, photoUploadFailed);
       navigation.goBack();
     } catch (saveError) {
       setSubmitError(getErrorMessage(saveError));

@@ -230,6 +230,14 @@ componente `Avatar` exibe uma imagem padrão.
   `storage.rules` (passo 5 acima). Dependendo do projeto, o Firebase pode exigir o plano **Blaze** (pay-as-you-go, com cota
   gratuita) para criar o bucket.
 
+> ⚠️ **Status no projeto entregue:** o código de seleção, permissão e envio das fotos está implementado, mas o **Storage não foi
+> habilitado** no projeto Firebase `cp2-chat`: o Firebase exige o plano Blaze (com cartão de crédito) para criar o bucket, e a
+> equipe optou por não ativá-lo. Por isso, no app entregue, usuários e grupos usam a **imagem padrão**. Se alguém escolher uma
+> foto, o envio falha de forma tratada: no **cadastro** a conta é criada mesmo assim (com aviso), na **criação/edição do grupo** o
+> grupo é salvo sem a foto (com aviso) e no **perfil** aparece a mensagem "Não foi possível enviar a imagem". Para ativar as
+> fotos basta habilitar o Storage (plano Blaze) e rodar `npx firebase-tools deploy --only storage --project cp2-chat`; nenhuma
+> alteração de código é necessária. Nenhuma outra funcionalidade depende das fotos.
+
 ---
 
 ## 🔔 Notificações push no Android e no iOS
@@ -454,44 +462,80 @@ FIREBASE_DATABASE_EMULATOR_HOST=127.0.0.1:9000 GCLOUD_PROJECT=demo-cp2 npm run d
 EXPO_PUBLIC_FIREBASE_EMULATOR_HOST=127.0.0.1 EXPO_PUBLIC_API_URL=http://127.0.0.1:3001 npx expo start
 ```
 
-As telas da seção seguinte foram capturadas assim (app rodando no navegador, com um script de captura). Observação: na
-pré-visualização web não existe push nem `Alert` nativo; isso não afeta o app nos dispositivos.
+O modo emulador também permite pré-visualizar o app no navegador durante o desenvolvimento. Observação: na pré-visualização web
+não existe push nem `Alert` nativo; isso não afeta o app nos dispositivos. **Os prints da documentação foram tirados no emulador
+Android** (veja a seção seguinte), com o projeto Firebase real e a API publicada.
 
 ---
 
 ## 📸 Prints das telas
 
-> As imagens abaixo foram geradas com o app em **modo emulador** (pré-visualização no navegador, viewport de celular).
-> **Antes da entrega, a equipe deve adicionar as capturas do app no dispositivo físico e a evidência da notificação**
-> (veja a seção "Evidência de notificação recebida").
+> **Ambiente das capturas:** dois emuladores **Android (Pixel, Android com Google Play)** executando o *development build* do app,
+> com o **projeto Firebase real** (`cp2-chat`) e a **API publicada** no Render. As contas são de teste dos integrantes. Nos prints
+> do perfil, o e-mail, o celular e a data de nascimento foram **ocultados** para não expor dados pessoais.
 
-| Login | Erro de login | Cadastro (validações) |
+### Autenticação
+
+| Login | Erro de credenciais | Cadastro |
 |---|---|---|
-| ![Login](docs/screenshots/01-login.png) | ![Erro de login](docs/screenshots/02-login-erro.png) | ![Cadastro](docs/screenshots/03-cadastro-validacao.png) |
+| <img src="docs/screenshots/01-login.png" alt="Tela de login" width="230"> | <img src="docs/screenshots/02-login-erro.png" alt="Erro de login" width="230"> | <img src="docs/screenshots/03-cadastro.png" alt="Tela de cadastro" width="230"> |
 
-| Conversas | Usuários | Busca de usuários |
+### Conversas e usuários
+
+| Estado vazio | Lista com individual e grupo | Usuários (nova conversa, com busca) |
 |---|---|---|
-| ![Conversas](docs/screenshots/04-conversas.png) | ![Usuários](docs/screenshots/05-usuarios.png) | ![Busca](docs/screenshots/06-usuarios-busca.png) |
+| <img src="docs/screenshots/05-conversas-vazio.png" alt="Conversas vazio" width="230"> | <img src="docs/screenshots/13-lista-conversas.png" alt="Lista de conversas" width="230"> | <img src="docs/screenshots/06-usuarios.png" alt="Lista de usuários" width="230"> |
 
-| Chat em grupo | Integrantes do grupo | Perfil do integrante |
+### Conversa individual e perfil
+
+Conversa entre duas contas, cada uma em um emulador (mensagens enviadas à direita e recebidas à esquerda):
+
+<img src="docs/screenshots/07-chat-individual.png" alt="Conversa individual nos dois emuladores" width="520">
+
+| Perfil aberto pela foto do participante (dados cadastrais ocultados) |
+|---|
+| <img src="docs/screenshots/08-perfil-participante.png" alt="Perfil do participante" width="230"> |
+
+### Grupos, limite de integrantes e política de notificações
+
+| Criação (limite 3, vagas e políticas) | Grupo sem vagas | Integrantes do grupo |
 |---|---|---|
-| ![Chat em grupo](docs/screenshots/07-chat-grupo.png) | ![Integrantes](docs/screenshots/08-integrantes-grupo.png) | ![Perfil](docs/screenshots/09-perfil-integrante.png) |
+| <img src="docs/screenshots/09-grupo-criacao.png" alt="Criação de grupo" width="230"> | <img src="docs/screenshots/10-grupo-sem-vagas.png" alt="Grupo sem vagas" width="230"> | <img src="docs/screenshots/12-integrantes-grupo.png" alt="Integrantes do grupo" width="230"> |
 
-| Chat individual | Meu perfil | Editar grupo (limite, vagas, política) |
+Chat do grupo: autor, mensagens direcionadas a um integrante ("Para @...") e botão de menção. À direita, o push do grupo
+chegando no outro aparelho:
+
+<img src="docs/screenshots/11-chat-grupo.png" alt="Chat em grupo e push" width="520">
+
+### Notificações push (evidência de notificação recebida)
+
+| Permissão de notificações | Push com o app em segundo plano | Toque abre a conversa |
 |---|---|---|
-| ![Chat individual](docs/screenshots/10-chat-individual.png) | ![Meu perfil](docs/screenshots/11-meu-perfil.png) | ![Editar grupo](docs/screenshots/12-editar-grupo.png) |
+| <img src="docs/screenshots/04-permissao-notificacoes.png" alt="Permissão de notificações" width="230"> | <img src="docs/screenshots/14-push-segundo-plano.png" alt="Push em segundo plano" width="230"> | <img src="docs/screenshots/15-push-toque-abre-conversa.png" alt="Conversa aberta pelo toque" width="230"> |
 
-### Evidência de notificação recebida
+Push recebido com o app aberto (conversa individual):
 
-> ⚠️ **Pendente (equipe):** após publicar a API e instalar o development build em um aparelho físico, envie uma mensagem
-> de outro usuário com o app em segundo plano e salve a captura da notificação em
-> `docs/screenshots/13-notificacao-recebida.png`. Em seguida, substitua este aviso por:
->
-> `![Notificação recebida](docs/screenshots/13-notificacao-recebida.png)`
+<img src="docs/screenshots/16-push-app-aberto.png" alt="Push com o app aberto" width="230">
 
-Roteiro de verificação: (1) usuário A e B em aparelhos diferentes; (2) A cria um grupo com B e define a política;
-(3) com o app de B em segundo plano, A envia uma mensagem; (4) B recebe o push e, ao tocar, abre o grupo; (5) repita para as
-quatro políticas e confirme que o remetente nunca recebe a própria notificação.
+Resultado dos testes em aparelho (emuladores Android com Google Play, API publicada e FCM real):
+
+| Cenário | Resultado | Evidência |
+|---|---|---|
+| Mensagem individual com o app aberto | ✅ push recebido | 16 |
+| Mensagem de grupo (política "Todas as mensagens") com o destinatário em outra conversa | ✅ push recebido, com o nome do grupo e do autor | 11 (aparelho da direita) |
+| Mensagem individual com o app em **segundo plano** | ✅ push recebido na tela inicial do Android | 14 |
+| Toque na notificação | ✅ abre a conversa correspondente | 15 |
+| Remetente não recebe a própria notificação; políticas `mentioned_members`, `direct_messages_only` e `disabled`; idempotência; remoção de tokens inválidos | ✅ cobertos por testes automatizados (veja **Testes**) | — |
+
+### Firebase: bancos de dados
+
+| Cloud Firestore | Realtime Database: mensagens | Realtime Database: espelho de integrantes |
+|---|---|---|
+| <img src="docs/screenshots/17-firestore.png" alt="Firestore" width="300"> | <img src="docs/screenshots/18-realtime-db-mensagens.png" alt="Realtime Database mensagens" width="300"> | <img src="docs/screenshots/19-realtime-db-groupmembers.png" alt="Realtime Database groupMembers" width="300"> |
+
+O Firestore mostra as coleções `users`, `groups`, `directConversations` (id = `uidMenor_uidMaior`, que impede duas conversas
+para o mesmo par) e `notificationDispatches` (controle de idempotência do push). O Realtime Database mostra `messages`,
+`conversationMeta` e `groupMembers` (espelho dos integrantes escrito pela API, usado pelas regras).
 
 ---
 
@@ -508,8 +552,10 @@ quatro políticas e confirme que o remetente nunca recebe a própria notificaç�
   `users/{uid}/devices/{deviceId}.tokenType` e a API roteia por ele.
 - **Conectividade**: o Realtime Database mantém as mensagens enviadas offline em fila; o app mostra faixa de "sem conexão",
   falha de envio com **Reenviar** e aviso quando o push não pôde ser solicitado (a API é idempotente, então reenviar é seguro).
-- As capturas desta documentação foram feitas em modo emulador; o push real **não** pôde ser exercitado fora de um dispositivo
-  físico com a API publicada — a lógica de destinatários, idempotência e remoção de tokens é coberta por testes automatizados.
+- **O que foi testado em aparelho:** o app (development build) em dois emuladores Android com Google Play, usando o Firebase
+  real e a API publicada; o push (FCM) foi recebido com o app aberto e em segundo plano, e o toque abriu a conversa. **Não** foi
+  testado em celular físico nem no iOS (exige conta Apple Developer). A lógica de destinatários por política, idempotência e remoção
+  de tokens é coberta por testes automatizados.
 
 ---
 
