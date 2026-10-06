@@ -13,6 +13,22 @@ internet**, de acordo com uma política configurável por grupo.
 
 ---
 
+## 📲 Testar o app e a API (sem rodar nada localmente)
+
+| O quê | Onde |
+|---|---|
+| **APK Android** (app completo, sem servidor) | [Release v1.0.0 — baixar o `.apk` em *Assets*](https://github.com/LeoMasago/cp2-chat-firebase/releases/tag/1.0.0) · [download direto](https://github.com/LeoMasago/cp2-chat-firebase/releases/download/1.0.0/application-70793c93-6d91-4401-a4b8-03c0ad88895f.apk) |
+| **API publicada** (HTTPS) | https://cp2-chat-api-eqkm.onrender.com |
+| **Health check** da API | https://cp2-chat-api-eqkm.onrender.com/health |
+
+Como testar: instale o APK em um Android (ou em um emulador com Google Play), permita "instalar apps de fontes desconhecidas" se o
+Android pedir, crie uma conta e permita as notificações. Para ver o **push**, use **duas contas em dois aparelhos** (ou dois
+emuladores): deixe o app do destinatário em **segundo plano** e envie uma mensagem com a outra conta. O push é enviado pela API
+publicada, sem nenhum servidor local. A configuração do Firebase (`firebaseConfig.json`) e as regras de segurança estão neste
+repositório.
+
+---
+
 ## 📑 Sumário
 
 1. [Tecnologias e versões](#-tecnologias-e-versões)
